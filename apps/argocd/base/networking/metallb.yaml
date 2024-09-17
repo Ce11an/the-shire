@@ -1,0 +1,40 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: metallb
+spec:
+  project: networking
+  source:
+    repoURL: 'https://github.com/Ce11an/the-shire.git'
+    targetRevision: main
+    path: apps/networking/metallb
+  destination:
+    namespace: metallb-system
+    name: in-cluster
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    managedNamespaceMetadata:
+      labels:
+        pod-security.kubernetes.io/enforce: privileged
+        pod-security.kubernetes.io/audit: privileged
+        pod-security.kubernetes.io/warn: privileged
+    syncOptions:
+      - Prune=true
+      - ServerSideApply=true
+      - CreateNamespace=true
+    retry:
+        limit: 5
+        backoff:
+          duration: 20s
+          factor: 2
+          maxDuration: 15m
+  info:
+    - name: "Github Repository:"
+      value: >-
+        https://github.com/metallb/metallb
+    - name: "Official documentation:"
+      value: >-
+        https://metallb.universe.tf/
+

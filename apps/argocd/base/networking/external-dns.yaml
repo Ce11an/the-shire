@@ -1,0 +1,40 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: external-dns
+spec:
+  project: networking
+  source:
+    repoURL: 'https://github.com/Ce11an/the-shire.git'
+    targetRevision: main
+    path: apps/networking/external-dns
+  destination:
+    namespace: kube-system
+    name: in-cluster
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - Prune=true
+      - ServerSideApply=true
+    retry:
+      limit: 10
+      backoff:
+        duration: 20s
+        factor: 2
+        maxDuration: 15m
+  info:
+    - name: "Github Repository:"
+      value: >-
+        https://github.com/kubernetes-sigs/external-dns
+    - name: "Helm chart:"
+      value: >-
+        https://github.com/kubernetes-sigs/external-dns/tree/master/charts/external-dns
+    - name: "Image registry explorer:"
+      value: >-
+        https://explore.ggcr.dev/?repo=registry.k8s.io%2Fexternal-dns%2Fexternal-dns
+    - name: "Official documentation:"
+      value: >-
+        https://kubernetes-sigs.github.io/external-dns
+

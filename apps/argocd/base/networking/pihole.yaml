@@ -1,0 +1,48 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: pihole
+spec:
+  project: networking
+  sources:
+    - repoURL: https://mojo2600.github.io/pihole-kubernetes/
+      targetRevision: "2.26.1"
+      chart: pihole
+      helm:
+        releaseName: pihole
+        valueFiles:
+          - $values/apps/networking/pihole/values.yaml
+    - repoURL: 'https://github.com/Ce11an/the-shire.git'
+      ref: values
+      targetRevision: main
+      path: apps/networking/pihole
+  destination:
+    namespace: pihole-system
+    name: in-cluster
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    managedNamespaceMetadata:
+      labels:
+        pod-security.kubernetes.io/enforce: privileged
+        pod-security.kubernetes.io/audit: privileged
+        pod-security.kubernetes.io/warn: privileged
+    syncOptions:
+      - Prune=true
+      - ServerSideApply=true
+      - CreateNamespace=true
+    retry:
+        limit: 5
+        backoff:
+          duration: 20s
+          factor: 2
+          maxDuration: 15m
+  info:
+    - name: "Github Repository:"
+      value: >-
+        https://github.com/pi-hole/pi-hole
+    - name: "Official documentation:"
+      value: >-
+        https://pi-hole.net/
+
